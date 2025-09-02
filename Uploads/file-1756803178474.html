@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureTech Sales</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0a0a1a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        
+        .futuristic-font {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #00dbde, #fc00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .coverflow-container {
+            perspective: 1000px;
+            height: 400px;
+            position: relative;
+        }
+        
+        .coverflow-slider {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s ease;
+        }
+        
+        .coverflow-slide {
+            position: absolute;
+            width: 60%;
+            height: 80%;
+            left: 20%;
+            top: 10%;
+            transition: all 1s ease;
+            box-shadow: 0 0 20px rgba(0, 219, 222, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .coverflow-slide.active {
+            transform: translateZ(100px);
+            filter: none;
+        }
+        
+        .coverflow-slide.left {
+            transform: rotateY(30deg) translateZ(-100px) scale(0.8);
+            filter: blur(2px) brightness(0.7);
+            left: 0;
+        }
+        
+        .coverflow-slide.right {
+            transform: rotateY(-30deg) translateZ(-100px) scale(0.8);
+            filter: blur(2px) brightness(0.7);
+            left: auto;
+            right: 0;
+        }
+        
+        .product-card {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 219, 222, 0.2);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 219, 222, 0.2);
+            border-color: rgba(0, 219, 222, 0.5);
+        }
+        
+        .price-cut {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .price-cut::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #ff0000, #ff4d4d);
+            transform: rotate(-5deg);
+        }
+        
+        .faq-item {
+            border-bottom: 1px solid rgba(0, 219, 222, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item:hover {
+            background-color: rgba(0, 219, 222, 0.05);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .faq-answer.open {
+            max-height: 300px;
+        }
+        
+        .floating-input {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+            transform: scale(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease;
+        }
+        
+        .floating-input.active {
+            transform: scale(1);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(0, 219, 222, 0.5);
+            border-radius: 8px;
+            padding: 10px 20px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+        }
+        
+        .glow {
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px rgba(0, 219, 222, 0.5);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(0, 219, 222, 0.8), 0 0 30px rgba(0, 219, 222, 0.6);
+            }
+        }
+        
+        .countdown-box {
+            background: linear-gradient(145deg, #0f0c29, #302b63);
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .countdown-number {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #00dbde, #fc00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-80 backdrop-filter backdrop-blur-lg border-b border-gray-800">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="text-white text-2xl font-bold gradient-text futuristic-font">
+                        FutureTech
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-300 hover:text-white transition duration-300 futuristic-font">Keunggulan</a>
+                    <a href="#pricing" class="text-gray-300 hover:text-white transition duration-300 futuristic-font">Price</a>
+                    <a href="#contact" class="text-gray-300 hover:text-white transition duration-300 futuristic-font">Contact</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-btn" class="text-gray-300 focus:outline-none">
+                        <i data-feather="menu"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-black bg-opacity-90 px-6 py-4">
+            <div class="flex flex-col space-y-4">
+                <a href="#features" class="text-gray-300 hover:text-white transition duration-300 futuristic-font">Keunggulan</a>
+                <a href="#pricing" class="text-gray-300 hover:text-white transition duration-300 futuristic-font">Price</a>
+                <a href="#contact" class="text-gray-300 hover:text-white transition duration-300 futuristic-font">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-6">
+        <div class="container mx-auto">
+            <div class="flex flex-col lg:flex-row items-center">
+                <div class="lg:w-1/2 mb-12 lg:mb-0" data-aos="fade-right">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 gradient-text futuristic-font">
+                        Revolutionize Your <span class="text-white">Digital Presence</span>
+                    </h1>
+                    <p class="text-gray-400 mb-8 text-lg">
+                        Cutting-edge solutions for the future. Our products are designed to give you the competitive edge in the digital landscape.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#pricing" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full text-white font-bold hover:opacity-90 transition duration-300 futuristic-font glow">
+                            Get Started
+                        </a>
+                        <a href="#features" class="px-8 py-3 border border-blue-500 rounded-full text-blue-400 font-bold hover:bg-blue-900 hover:bg-opacity-30 transition duration-300 futuristic-font">
+                            Learn More
+                        </a>
+                    </div>
+                </div>
+                <div class="lg:w-1/2" data-aos="fade-left">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl opacity-20 blur-3xl"></div>
+                        <div class="relative bg-gray-900 bg-opacity-50 border border-gray-800 rounded-3xl p-6">
+                            <div class="countdown-box p-6 mb-8">
+                                <h3 class="text-center text-gray-300 mb-4 futuristic-font">PROMO ENDS IN:</h3>
+                                <div class="flex justify-center space-x-4 text-center">
+                                    <div>
+                                        <div class="countdown-number futuristic-font" id="days">00</div>
+                                        <div class="text-gray-400 text-sm futuristic-font">Hari</div>
+                                    </div>
+                                    <div class="text-3xl text-purple-500">:</div>
+                                    <div>
+                                        <div class="countdown-number futuristic-font" id="hours">03</div>
+                                        <div class="text-gray-400 text-sm futuristic-font">Jam</div>
+                                    </div>
+                                    <div class="text-3xl text-purple-500">:</div>
+                                    <div>
+                                        <div class="countdown-number futuristic-font" id="minutes">01</div>
+                                        <div class="text-gray-400 text-sm futuristic-font">Menit</div>
+                                    </div>
+                                    <div class="text-3xl text-purple-500">:</div>
+                                    <div>
+                                        <div class="countdown-number futuristic-font" id="seconds">23</div>
+                                        <div class="text-gray-400 text-sm futuristic-font">Detik</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-center text-gray-400 mb-6">
+                                Harga promo akan berakhir sebentar lagi! Segera dapatkan produk kami dengan harga spesial.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3D Coverflow Slider -->
+    <section class="py-20 px-6 bg-gradient-to-b from-black to-gray-900">
+        <div class="container mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16 gradient-text futuristic-font" data-aos="fade-up">
+                Our Futuristic Products
+            </h2>
+            <div class="coverflow-container" data-aos="fade-up">
+                <div class="coverflow-slider" id="coverflow-slider">
+                    <div class="coverflow-slide left" style="background-image: url('https://cdn.pixabay.com/photo/2021/10/11/17/54/technology-6701504_1280.jpg');"></div>
+                    <div class="coverflow-slide active" style="background-image: url('https://cdn.pixabay.com/photo/2023/04/23/13/24/ai-generated-7945706_1280.jpg');"></div>
+                    <div class="coverflow-slide right" style="background-image: url('https://ats.org/wp-content/smush-webp/2020/04/Index-High-Tech-Future-2400x1374.jpg.webp');"></div>
+                    <div class="coverflow-slide" style="background-image: url('https://cdn.pixabay.com/photo/2018/05/14/16/54/cyber-3400789_640.jpg');"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="pricing" class="py-20 px-6 bg-gray-900">
+        <div class="container mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16 gradient-text futuristic-font" data-aos="fade-up">
+                Our Products
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Product 1 -->
+                <div class="product-card p-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex justify-center mb-6">
+                        <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <i data-feather="cpu" class="text-white w-10 h-10"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-4 text-white futuristic-font">Panel Unlimited</h3>
+                    <div class="text-center mb-6">
+                        <span class="price-cut text-gray-400 mr-2">Rp77.000</span>
+                        <span class="text-2xl font-bold text-white">Rp70.000</span>
+                    </div>
+                    <ul class="mb-8 text-gray-400 space-y-2">
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Unlimited access
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Premium features
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            24/7 support
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white font-bold hover:opacity-90 transition duration-300 futuristic-font order-btn" data-product="Panel Unlimited (70.000)">
+                        Order Now
+                    </button>
+                </div>
+                
+                <!-- Product 2 -->
+                <div class="product-card p-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex justify-center mb-6">
+                        <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <i data-feather="message-square" class="text-white w-10 h-10"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-4 text-white futuristic-font">Script Bot WhatsApp</h3>
+                    <div class="text-center mb-6">
+                        <span class="price-cut text-gray-400 mr-2">Rp88.000</span>
+                        <span class="text-2xl font-bold text-white">Rp80.000</span>
+                    </div>
+                    <ul class="mb-8 text-gray-400 space-y-2">
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Automated messaging
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Customizable templates
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Easy integration
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white font-bold hover:opacity-90 transition duration-300 futuristic-font order-btn" data-product="Script Bot WhatsApp (80.000)">
+                        Order Now
+                    </button>
+                </div>
+                
+                <!-- Product 3 -->
+                <div class="product-card p-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="flex justify-center mb-6">
+                        <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <i data-feather="code" class="text-white w-10 h-10"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-4 text-white futuristic-font">Jasa Edit Script</h3>
+                    <div class="text-center mb-6">
+                        <span class="price-cut text-gray-400 mr-2">Rp11.000</span>
+                        <span class="text-2xl font-bold text-white">Rp10.000</span>
+                    </div>
+                    <ul class="mb-8 text-gray-400 space-y-2">
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Professional editing
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Fast turnaround
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Quality guarantee
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white font-bold hover:opacity-90 transition duration-300 futuristic-font order-btn" data-product="Jasa Edit Script (10.000)">
+                        Order Now
+                    </button>
+                </div>
+                
+                <!-- Product 4 -->
+                <div class="product-card p-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex justify-center mb-6">
+                        <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <i data-feather="image" class="text-white w-10 h-10"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-4 text-white futuristic-font">Design Foto Basic</h3>
+                    <div class="text-center mb-6">
+                        <span class="price-cut text-gray-400 mr-2">Rp11.000</span>
+                        <span class="text-2xl font-bold text-white">Rp10.000</span>
+                    </div>
+                    <ul class="mb-8 text-gray-400 space-y-2">
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Simple edits
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Fast delivery
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Up to 3 revisions
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white font-bold hover:opacity-90 transition duration-300 futuristic-font order-btn" data-product="Design Foto Basic (10.000)">
+                        Order Now
+                    </button>
+                </div>
+                
+                <!-- Product 5 -->
+                <div class="product-card p-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex justify-center mb-6">
+                        <div class="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <i data-feather="camera" class="text-white w-10 h-10"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-4 text-white futuristic-font">Design Foto Premium</h3>
+                    <div class="text-center mb-6">
+                        <span class="price-cut text-gray-400 mr-2">Rp33.000</span>
+                        <span class="text-2xl font-bold text-white">Rp30.000</span>
+                    </div>
+                    <ul class="mb-8 text-gray-400 space-y-2">
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Advanced edits
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Professional quality
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-500 mr-2"></i>
+                            Unlimited revisions
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white font-bold hover:opacity-90 transition duration-300 futuristic-font order-btn" data-product="Design Foto Premium (30.000)">
+                        Order Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-6 bg-gradient-to-b from-gray-900 to-black">
+        <div class="container mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16 gradient-text futuristic-font" data-aos="fade-up">
+                Keunggulan Kami
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-gray-900 bg-opacity-50 border border-gray-800 rounded-xl p-8" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mb-6">
+                        <i data-feather="zap" class="text-white w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-white futuristic-font">High Performance</h3>
+                    <p class="text-gray-400">
+                        Produk kami dioptimalkan untuk memberikan performa terbaik dengan resource minimal.
+                    </p>
+                </div>
+                <div class="bg-gray-900 bg-opacity-50 border border-gray-800 rounded-xl p-8" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mb-6">
+                        <i data-feather="shield" class="text-white w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-white futuristic-font">Secure & Private</h3>
+                    <p class="text-gray-400">
+                        Keamanan data Anda adalah prioritas kami dengan enkripsi tingkat tinggi.
+                    </p>
+                </div>
+                <div class="bg-gray-900 bg-opacity-50 border border-gray-800 rounded-xl p-8" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mb-6">
+                        <i data-feather="clock" class="text-white w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-white futuristic-font">24/7 Support</h3>
+                    <p class="text-gray-400">
+                        Tim support kami siap membantu Anda kapan saja, setiap hari.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 px-6 bg-black">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16 gradient-text futuristic-font" data-aos="fade-up">
+                Frequently Asked Questions
+            </h2>
+            <div class="space-y-4">
+                <!-- FAQ 1 -->
+                <div class="faq-item bg-gray-900 bg-opacity-50 border border-gray-800 rounded-xl p-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex justify-between items-center cursor-pointer faq-question">
+                        <h3 class="text-lg font-bold text-white futuristic-font">Bagaimana cara memesan produk?</h3>
+                        <i data-feather="chevron-down" class="text-blue-500 transition-transform duration-300"></i>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-400">
+                            Anda bisa langsung klik tombol "Order Now" pada produk yang ingin dibeli, lalu ikuti instruksi yang diberikan. Pembayaran bisa dilakukan via transfer bank atau e-wallet.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- FAQ 2 -->
+                <div class="faq-item bg-gray-900 bg-opacity-50 border border-gray-800 rounded-xl p-6" data-aos="fade-up" data-aos-delay="150">
+                    <div class="flex justify-between items-center cursor-pointer faq-question">
+                        <h3 class="text-lg font-bold text-white futuristic-font">Berapa lama proses pengiriman?</h3>
+                        <i data-feather="chevron-down" class="text-blue-500 transition-transform duration-300"></i>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-400">
+                            Untuk produk digital, biasanya dikirim dalam waktu 1-3 jam setelah pembayaran dikonfirmasi. Untuk jasa editing, waktu penyelesaian tergantung pada kompleksitas permintaan.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- FAQ 3 -->
+                <div class="faq-item bg-gray-900 bg-opacity-50 border border-gray-800 rounded-xl p-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex justify-between items-center cursor-pointer faq-question">
+                        <h3 class="text-lg font-bold text-white futuristic-font">Apakah ada garansi untuk produk?</h3>
+                        <i data-feather="chevron-down" class="text-blue-500 transition-transform duration-300"></i>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-400">
+                            Ya, semua produk kami memiliki garansi 30 hari. Jika ada masalah dengan produk yang Anda terima, kami akan memperbaikinya atau memberikan penggantian.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- FAQ 4 -->
+                <div class="faq-item bg-gray-900 bg-opacity-50 border border-gray-800 rounded-xl p-6" data-aos="fade-up" data-aos-delay="250">
+                    <div class="flex justify-between items-center cursor-pointer faq-question">
+                        <h3 class="text-lg font-bold text-white futuristic-font">Bagaimana jika saya ingin request fitur khusus?</h3>
+                        <i data-feather="chevron-down" class="text-blue-500 transition-transform duration-300"></i>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-400">
+                            Anda bisa menghubungi kami melalui WhatsApp atau email untuk mendiskusikan kebutuhan khusus Anda. Kami akan memberikan penawaran harga yang sesuai dengan kompleksitas permintaan.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- FAQ 5 -->
+                <div class="faq-item bg-gray-900 bg-opacity-50 border border-gray-800 rounded-xl p-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="flex justify-between items-center cursor-pointer faq-question">
+                        <h3 class="text-lg font-bold text-white futuristic-font">Apakah harga promo akan diperpanjang?</h3>
+                        <i data-feather="chevron-down" class="text-blue-500 transition-transform duration-300"></i>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-400">
+                            Harga promo bersifat terbatas dan tidak ada jaminan akan diperpanjang. Kami sarankan untuk memanfaatkan harga promo sekarang sebelum kembali ke harga normal.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 px-6 bg-gradient-to-b from-black to-gray-900">
+        <div class="container mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16 gradient-text futuristic-font" data-aos="fade-up">
+                Contact Us
+            </h2>
+            <div class="max-w-4xl mx-auto bg-gray-900 bg-opacity-50 border border-gray-800 rounded-2xl p-8" data-aos="fade-up">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-6 text-white futuristic-font">Get in Touch</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-4">
+                                    <i data-feather="mail" class="text-white w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-gray-400 mb-1 futuristic-font">Email</h4>
+                                    <p class="text-white">support@futuretech.com</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-4">
+                                    <i data-feather="phone" class="text-white w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-gray-400 mb-1 futuristic-font">Phone</h4>
+                                    <p class="text-white">+62 822-5250-9320</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-4">
+                                    <i data-feather="map-pin" class="text-white w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-gray-400 mb-1 futuristic-font">Location</h4>
+                                    <p class="text-white">Jakarta, Indonesia</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <h4 class="text-gray-400 mb-4 futuristic-font">Follow Us</h4>
+                            <div class="flex space-x-4">
+                                <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition duration-300">
+                                    <i data-feather="facebook" class="text-white w-5 h-5"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition duration-300">
+                                    <i data-feather="instagram" class="text-white w-5 h-5"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition duration-300">
+                                    <i data-feather="youtube" class="text-white w-5 h-5"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-6 text-white futuristic-font">Send Us a Message</h3>
+                        <form id="contact-form">
+                            <div class="mb-4">
+                                <label for="name" class="block text-gray-400 mb-2 futuristic-font">Your Name</label>
+                                <input type="text" id="name" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="mb-4">
+                                <label for="email" class="block text-gray-400 mb-2 futuristic-font">Your Email</label>
+                                <input type="email" id="email" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="mb-4">
+                                <label for="message" class="block text-gray-400 mb-2 futuristic-font">Message</label>
+                                <textarea id="message" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white font-bold hover:opacity-90 transition duration-300 futuristic-font">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-12 px-6 border-t border-gray-800">
+        <div class="container mx-auto">
+            <div class="flex flex-col items-center">
+                <div class="text-white text-2xl font-bold gradient-text futuristic-font mb-6">
+                    FutureTech
+                </div>
+                <div class="text-gray-400 text-center max-w-2xl mb-8">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                </div>
+                <div class="flex space-x-6 mb-8">
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i data-feather="facebook"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i data-feather="twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i data-feather="instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i data-feather="youtube"></i>
+                    </a>
+                </div>
+                <div class="text-gray-500 text-sm">
+                    &copy; 2023 FutureTech. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Input -->
+    <div class="floating-input" id="floating-input">
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-2xl w-80">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-white font-bold futuristic-font">Need Help?</h3>
+                <button id="close-input" class="text-gray-400 hover:text-white">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <input type="text" id="message-input" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your message...">
+            <button id="send-message" class="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white font-bold hover:opacity-90 transition duration-300 futuristic-font">
+                Send via WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Button -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="open-input" class="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-xl hover:opacity-90 transition duration-300">
+            <i data-feather="message-circle" class="text-white w-6 h-6"></i>
+        </button>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <div class="flex items-center">
+            <i data-feather="shopping-cart" class="text-blue-500 mr-2"></i>
+            <span id="notification-text"></span>
+        </div>
+    </div>
+
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        
+        // Initialize feather icons
+        feather.replace();
+        
+        // Mobile menu toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            const icon = menuBtn.querySelector('svg');
+            if (mobileMenu.classList.contains('hidden')) {
+                feather.replace();
+            } else {
+                icon.setAttribute('data-feather', 'x');
+                feather.replace();
+            }
+        });
+        
+        // Countdown timer
+        function updateCountdown() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            
+            // Calculate remaining time (24-hour format)
+            const remainingHours = 23 - hours;
+            const remainingMinutes = 59 - minutes;
+            const remainingSeconds = 59 - seconds;
+            
+            document.getElementById('days').textContent = '00';
+            document.getElementById('hours').textContent = remainingHours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = remainingMinutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = remainingSeconds.toString().padStart(2, '0');
+        }
+        
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        
+        // 3D Coverflow Slider
+        const coverflowSlider = document.getElementById('coverflow-slider');
+        const slides = document.querySelectorAll('.coverflow-slide');
+        let currentSlide = 1;
+        
+        function updateSlider() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'left', 'right');
+                
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index === (currentSlide - 1 + slides.length) % slides.length) {
+                    slide.classList.add('left');
+                } else if (index === (currentSlide + 1) % slides.length) {
+                    slide.classList.add('right');
+                }
+            });
+        }
+        
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateSlider();
+        }
+        
+        updateSlider();
+        setInterval(nextSlide, 7000);
+        
+        // FAQ accordion
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.parentElement.querySelector('.faq-answer');
+                const icon = question.querySelector('svg');
+                
+                answer.classList.toggle('open');
+                
+                if (answer.classList.contains('open')) {
+                    icon.style.transform = 'rotate(180deg)';
+                } else {
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            });
+        });
+        
+        // Floating input toggle
+        const floatingInput = document.getElementById('floating-input');
+        const openInputBtn = document.getElementById('open-input');
+        const closeInputBtn = document.getElementById('close-input');
+        
+        openInputBtn.addEventListener('click', () => {
+            floatingInput.classList.add('active');
+        });
+        
+        closeInputBtn.addEventListener('click', () => {
+            floatingInput.classList.remove('active');
+        });
+        
+        // Send message via WhatsApp
+        const sendMessageBtn = document.getElementById('send-message');
+        const messageInput = document.getElementById('message-input');
+        
+        sendMessageBtn.addEventListener('click', () => {
+            const message = messageInput.value.trim();
+            if (message) {
+                window.open(`https://wa.me/6282252509320?text=${encodeURIComponent(message)}`, '_blank');
+                messageInput.value = '';
+                floatingInput.classList.remove('active');
+            }
+        });
+        
+        // Contact form
+        const contactForm = document.getElementById('contact-form');
+        
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            
+            const fullMessage = `Name: ${name}\nEmail: ${email}\nMessage: ${message}`;
+            window.open(`https://wa.me/6282252509320?text=${encodeURIComponent(fullMessage)}`, '_blank');
+            
+            contactForm.reset();
+        });
+        
+        // Order buttons
+        const orderButtons = document.querySelectorAll('.order-btn');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notification-text');
+        
+        const products = [
+            "Panel Unlimited (70.000)",
+            "Script Bot WhatsApp (80.000)",
+            "Jasa Edit Script (10.000)",
+            "Design Foto Basic (10.000)",
+            "Design Foto Premium (30.000)"
+        ];
+        
+        const names = [
+            "Andi", "Budi", "Citra", "Dewi", "Eka", "Fajar", "Gita", "Hadi", "Indra", "Joko",
+            "Kiki", "Lina", "Mira", "Nina", "Oki", "Putri", "Rani", "Sari", "Toni", "Umar",
+            "Vina", "Wati", "Yani", "Zahra", "Ahmad", "Bayu", "Cindy", "Doni", "Eva", "Fani",
+            "Gina", "Hendra", "Irma", "Joni", "Karin", "Lia", "Maya", "Nia", "Odi", "Prita",
+            "Rina", "Siska", "Tina", "Uci", "Vivi", "Wawan", "Yoga", "Zaki", "Ade", "Bella"
+        ];
+        
+        function showRandomNotification() {
+            const randomName = names[Math.floor(Math.random() * names.length)];
+            const randomProduct = products[Math.floor(Math.random() * products.length)];
+            notificationText.textContent = `${randomName} just purchased ${randomProduct}`;
+            
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Show initial notification
+        setTimeout(showRandomNotification, 3000);
+        
+        // Show random notifications periodically
+        setInterval(showRandomNotification, 15000);
+        
+        // Order button click
+        orderButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const product = button.getAttribute('data-product');
+                window.open(`https://wa.me/6282252509320?text=${encodeURIComponent(`I want to order: ${product}`)}`, '_blank');
+            });
+        });
+    </script>
+</body>
+</html>
